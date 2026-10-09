@@ -16,26 +16,9 @@ foreach ($storageDirs as $dir) {
     }
 }
 
-// 2. Set storage paths to /tmp
-putenv('APP_STORAGE=/tmp/storage');
+// 2. Set storage path override
 $_ENV['APP_STORAGE'] = '/tmp/storage';
+putenv('APP_STORAGE=/tmp/storage');
 
-// 3. Require Composer autoloader (This fixes the Class not found error)
-require __DIR__ . '/../vendor/autoload.php';
-
-// 4. Load Laravel application and handle request
-$app = require_once __DIR__ . '/../bootstrap/app.php';
-
-if (method_exists($app, 'useStoragePath')) {
-    $app->useStoragePath('/tmp/storage');
-}
-
-$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
-
-$response = $kernel->handle(
-    $request = Illuminate\Http\Request::capture()
-);
-
-$response->send();
-
-$kernel->terminate($request, $response);
+// 3. Forward to public index (Laravel handles the application bootstrap)
+require __DIR__ . '/../public/index.php';
