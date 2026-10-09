@@ -1,6 +1,6 @@
 <?php
 
-// 1. Prepare temporary writable directories for Vercel
+// 1. Create required storage directories in /tmp for Vercel
 $storageDirs = [
     '/tmp/storage/app',
     '/tmp/storage/framework/cache',
@@ -16,9 +16,19 @@ foreach ($storageDirs as $dir) {
     }
 }
 
-// 2. Set environment variables for storage override
-putenv('APP_STORAGE=/tmp/storage');
-$_ENV['APP_STORAGE'] = '/tmp/storage';
+// 2. Load Laravel application and override storage path safely
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 
-// 3. Forward to public index
-require __DIR__ . '/../public/index.php';
+if (method_exists($app, 'useStoragePath')) {
+    $app->useStoragePath('/tmp/storage');
+}
+
+$kernel = $app->make(Illuminate\Contracts\Http\Kernel::class);
+
+$response = $kernel->handle(
+    $request = Illuminate\Http\Request::capture()
+);
+
+$response->send();
+
+$kernel->terminate($request, $response);
