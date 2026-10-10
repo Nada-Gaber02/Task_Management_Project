@@ -1,11 +1,14 @@
+
 <?php
 
+$storage = '/tmp/storage';
+
 $storageDirs = [
-    '/tmp/storage/app',
-    '/tmp/storage/framework/cache',
-    '/tmp/storage/framework/sessions',
-    '/tmp/storage/framework/views',
-    '/tmp/storage/logs',
+    $storage . '/app',
+    $storage . '/framework/cache',
+    $storage . '/framework/sessions',
+    $storage . '/framework/views',
+    $storage . '/logs',
     '/tmp/bootstrap/cache',
 ];
 
@@ -15,7 +18,12 @@ foreach ($storageDirs as $dir) {
     }
 }
 
-putenv('APP_STORAGE=/tmp/storage');
-$_ENV['APP_STORAGE'] = '/tmp/storage';
+putenv('LARAVEL_STORAGE_PATH=' . $storage);
+$_ENV['LARAVEL_STORAGE_PATH'] = $storage;
+$_SERVER['LARAVEL_STORAGE_PATH'] = $storage;
+
+putenv('LOG_CHANNEL=stderr');
+$_ENV['LOG_CHANNEL'] = 'stderr';
+$_SERVER['LOG_CHANNEL'] = 'stderr';
 
 require __DIR__ . '/../public/index.php';
