@@ -1,8 +1,5 @@
-
 <?php
-
 header('Content-Type: application/json; charset=utf-8');
-
 try {
     require __DIR__ . '/../vendor/autoload.php';
 
@@ -20,11 +17,9 @@ try {
         ),
         'view_bound_before_bootstrap' => $app->bound('view'),
     ];
-
     $kernel = $app->make(
         Illuminate\Contracts\Http\Kernel::class
     );
-
     $kernel->bootstrap();
 
     $result['view_bound_after_bootstrap'] = $app->bound('view');
@@ -33,7 +28,6 @@ try {
     echo json_encode($result, JSON_PRETTY_PRINT);
 } catch (\Throwable $e) {
     http_response_code(500);
-
     echo json_encode([
         'status' => 'EXCEPTION',
         'class' => get_class($e),
