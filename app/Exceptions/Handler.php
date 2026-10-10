@@ -15,16 +15,14 @@ class Handler extends ExceptionHandler
     ];
 
     public function register(): void
-    {
-        $this->reportable(function (Throwable $e) {
-            Log::error('Laravel application exception', [
-                'exception_class' => get_class($e),
-                'message' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'url' => request()->path(),
-                'method' => request()->method(),
-            ]);
-        });
-    }
+{
+    $this->reportable(function (Throwable $e) {
+        error_log(
+            'LARAVEL_ERROR: ' . get_class($e)
+            . ' | ' . $e->getMessage()
+            . ' | ' . $e->getFile()
+            . ':' . $e->getLine()
+        );
+    });
+}
 }
