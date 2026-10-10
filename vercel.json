@@ -17,6 +17,10 @@
       "dest": "/api/index.php"
     },
     {
+      "src": "^/build/(.*)$",
+      "dest": "/build/$1"
+    },
+    {
       "handle": "filesystem"
     },
     {
