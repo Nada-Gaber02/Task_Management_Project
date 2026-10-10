@@ -1,38 +1,39 @@
 <?php
-header('Content-Type: application/json; charset=utf-8');
-try {
-    require __DIR__ . '/../vendor/autoload.php';
-
-    $app = require __DIR__ . '/../bootstrap/app.php';
-
-    $providers = Illuminate\Support\ServiceProvider::defaultProviders()
-        ->toArray();
-
-    $result = [
-        'app_created' => true,
-        'view_provider_in_defaults' => in_array(
-            Illuminate\View\ViewServiceProvider::class,
-            $providers,
-            true
-        ),
-        'view_bound_before_bootstrap' => $app->bound('view'),
-    ];
-    $kernel = $app->make(
-        Illuminate\Contracts\Http\Kernel::class
-    );
-    $kernel->bootstrap();
-
-    $result['view_bound_after_bootstrap'] = $app->bound('view');
-    $result['status'] = 'BOOTSTRAP_OK';
-
-    echo json_encode($result, JSON_PRETTY_PRINT);
-} catch (\Throwable $e) {
-    http_response_code(500);
-    echo json_encode([
-        'status' => 'EXCEPTION',
-        'class' => get_class($e),
-        'message' => $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine(),
-    ], JSON_PRETTY_PRINT);
+$storage = '/tmp/laravel-storage';
+$cache = '/tmp/laravel-bootstrap-cache';
+$directories = [
+    $storage . '/app',
+    $storage . '/framework/cache/data',
+    $storage . '/framework/sessions',
+    $storage . '/framework/views',
+    $storage . '/logs',
+    $cache,
+];
+foreach ($directories as $directory) {
+    if (!is_dir($directory) &&
+        !mkdir($directory, 0755, true) &&
+        !is_dir($directory)) {
+        throw new RuntimeException(
+            'Could not create directory: ' . $directory
+        );
+    }
 }
+putenv('APP_STORAGE=' . $storage);
+$_ENV['APP_STORAGE'] = $storage;
+$_SERVER['APP_STORAGE'] = $storage;
+putenv('LARAVEL_STORAGE_PATH=' . $storage);
+$_ENV['LARAVEL_STORAGE_PATH'] = $storage;
+$_SERVER['LARAVEL_STORAGE_PATH'] = $storage;
+putenv('APP_SERVICES_CACHE=' . $cache . '/services.php');
+putenv('APP_PACKAGES_CACHE=' . $cache . '/packages.php');
+putenv('APP_CONFIG_CACHE=' . $cache . '/config.php');
+putenv('APP_ROUTES_CACHE=' . $cache . '/routes.php');
+putenv('APP_EVENTS_CACHE=' . $cache . '/events.php');
+$_ENV['APP_SERVICES_CACHE'] = $cache . '/services.php';
+$_ENV['APP_PACKAGES_CACHE'] = $cache . '/packages.php';
+$_ENV['APP_CONFIG_CACHE'] = $cache . '/config.php';
+$_ENV['APP_ROUTES_CACHE'] = $cache . '/routes.php';
+$_ENV['APP_EVENTS_CACHE'] = $cache . '/events.php';
+putenv('LOG_CHANNEL=stderr');
+$_ENV['LOG_CHANNEL'] = 'stderr';
+require __DIR__ . '/../public/index.php';
