@@ -32,5 +32,7 @@ putenv('APP_PACKAGES_CACHE=' . $cache . '/packages.php');
 putenv('APP_CONFIG_CACHE=' . $cache . '/config.php');
 putenv('APP_ROUTES_CACHE=' . $cache . '/routes.php');
 putenv('APP_EVENTS_CACHE=' . $cache . '/events.php');
-
+putenv('LOG_CHANNEL=stderr');
+$_ENV['LOG_CHANNEL'] = 'stderr';
+$_SERVER['LOG_CHANNEL'] = 'stderr';
 require __DIR__ . '/../public/index.php';
