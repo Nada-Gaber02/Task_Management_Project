@@ -1,18 +1,21 @@
-
 <?php
 
-header('Content-Type: text/plain');
+$storageDirs = [
+    '/tmp/storage/app',
+    '/tmp/storage/framework/cache',
+    '/tmp/storage/framework/sessions',
+    '/tmp/storage/framework/views',
+    '/tmp/storage/logs',
+    '/tmp/bootstrap/cache',
+];
 
-echo "PHP runtime is working\n";
-echo "PHP version: " . PHP_VERSION . "\n";
-echo "Project root: " . dirname(__DIR__) . "\n";
+foreach ($storageDirs as $dir) {
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+}
 
-$root = dirname(__DIR__);
+putenv('APP_STORAGE=/tmp/storage');
+$_ENV['APP_STORAGE'] = '/tmp/storage';
 
-echo "Autoload exists: ";
-var_export(file_exists($root . '/vendor/autoload.php'));
-
-echo "\nBootstrap exists: ";
-var_export(file_exists($root . '/bootstrap/app.php'));
-
-echo "\n";
+require __DIR__ . '/../public/index.php';
