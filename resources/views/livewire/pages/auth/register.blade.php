@@ -38,7 +38,7 @@ new #[Layout('layouts.guest')] class extends Component
 }; ?>
 
 <div class="auth-form">
-    <form wire:submit="register" class="auth-form">
+    <form wire:submit="register" class="auth-form" novalidate>
         <!-- Name -->
         <div>
             <x-input-label for="name" :value="__('Name')" />

@@ -66,7 +66,6 @@ new #[Layout('layouts.guest')] class extends Component
             </x-primary-button>
         </div>
     </form>
-n
     @if (Route::has('register'))
         <div class="auth-divider">NEW TO TASKFLOW?</div>
         <a class="btn btn-outline-primary w-100" href="{{ route('register') }}" wire:navigate>{{ __('Register') }}</a>
