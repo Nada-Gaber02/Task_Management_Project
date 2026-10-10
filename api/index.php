@@ -1,38 +1,36 @@
 <?php
 
-header('Content-Type: application/json; charset=utf-8');
+$storage = '/tmp/laravel-storage';
+$bootstrap = '/tmp/laravel-bootstrap';
+$cache = $bootstrap . '/cache';
 
-try {
-    require __DIR__ . '/../vendor/autoload.php';
-
-    $app = require __DIR__ . '/../bootstrap/app.php';
-
-    $kernel = $app->make(
-        Illuminate\Contracts\Http\Kernel::class
-    );
-
-    $kernel->bootstrap();
-
-    echo json_encode([
-        'status' => 'BOOTSTRAP_OK',
-        'laravel_version' => Illuminate\Foundation\Application::VERSION,
-        'view_provider_registered' => $app->bound(
-            Illuminate\View\Factory::class
-        ),
-        'view_service_bound' => $app->bound('view'),
-        'view_provider_loaded' => class_exists(
-            Illuminate\View\ViewServiceProvider::class
-        ),
-    ], JSON_PRETTY_PRINT);
-
-} catch (\Throwable $e) {
-    http_response_code(500);
-
-    echo json_encode([
-        'status' => 'EXCEPTION',
-        'class' => get_class($e),
-        'message' => $e->getMessage(),
-        'file' => $e->getFile(),
-        'line' => $e->getLine(),
-    ], JSON_PRETTY_PRINT);
+foreach ([
+    $cache,
+    $storage . '/app',
+    $storage . '/framework/cache/data',
+    $storage . '/framework/sessions',
+    $storage . '/framework/views',
+    $storage . '/logs',
+] as $directory) {
+    if (
+        ! is_dir($directory) &&
+        ! mkdir($directory, 0755, true) &&
+        ! is_dir($directory)
+    ) {
+        throw new RuntimeException(
+            'Cannot create directory: ' . $directory
+        );
+    }
 }
+
+putenv('APP_STORAGE=' . $storage);
+$_ENV['APP_STORAGE'] = $storage;
+$_SERVER['APP_STORAGE'] = $storage;
+
+putenv('APP_SERVICES_CACHE=' . $cache . '/services.php');
+putenv('APP_PACKAGES_CACHE=' . $cache . '/packages.php');
+putenv('APP_CONFIG_CACHE=' . $cache . '/config.php');
+putenv('APP_ROUTES_CACHE=' . $cache . '/routes.php');
+putenv('APP_EVENTS_CACHE=' . $cache . '/events.php');
+
+require __DIR__ . '/../public/index.php';
