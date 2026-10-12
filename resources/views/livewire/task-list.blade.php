@@ -7,7 +7,8 @@
         <section class="welcome-section">
             <div>
                 <p class="eyebrow mb-2">YOUR PERSONAL WORKSPACE</p>
-                <h1 class="welcome-title">Make room for <span>great work.</span></h1>
+                <h1 class="welcome-title">HI, {{ auth()->user()->name }}</h1>
+                <h2 class="welcome-title">Make room for <span>great work.</span></h2>
                 <p class="welcome-copy mb-0">Keep your priorities clear and your day moving forward.</p>
             </div>
             <div class="welcome-date">
@@ -137,7 +138,6 @@
                             <div class="task-card-content">
                                 <div class="task-card-top">
                                     <div class="task-title-wrap">
-                                        <span class="task-number">TASK {{ str_pad($task->id, 2, '0', STR_PAD_LEFT) }}</span>
                                         <h3 class="task-title">{{ $task->title }}</h3>
                                     </div>
                                     <span class="status-badge {{ $task->is_completed ? 'status-complete' : 'status-pending' }}">
