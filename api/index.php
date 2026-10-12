@@ -5,51 +5,55 @@ use Illuminate\Http\Request;
 
 define('LARAVEL_START', microtime(true));
 
-/*
-|--------------------------------------------------------------------------
-| Check If The Application Is Under Maintenance
-|--------------------------------------------------------------------------
-|
-| If the application is in maintenance / demo mode via the "down" command
-| we will load this file so that any pre-rendered content can be shown
-| instead of starting the framework, which could cause an exception.
-|
-*/
+$storage = '/tmp/laravel-storage';
+$bootstrap = '/tmp/laravel-bootstrap';
+$cache = $bootstrap . '/cache';
 
-if (file_exists($maintenance = __DIR__.'/../storage/framework/maintenance.php')) {
-    require $maintenance;
+foreach ([
+    $cache,
+    $storage . '/app',
+    $storage . '/framework/cache/data',
+    $storage . '/framework/sessions',
+    $storage . '/framework/views',
+    $storage . '/logs',
+] as $directory) {
+    if (
+        ! is_dir($directory) &&
+        ! mkdir($directory, 0755, true) &&
+        ! is_dir($directory)
+    ) {
+        throw new RuntimeException(
+            'Cannot create directory: ' . $directory
+        );
+    }
 }
 
-/*
-|--------------------------------------------------------------------------
-| Register The Auto Loader
-|--------------------------------------------------------------------------
-|
-| Composer provides a convenient, automatically generated class loader for
-| this application. We just need to utilize it! We'll simply require it
-| into the script here so we don't need to manually load our classes.
-|
-*/
+$environment = [
+    'APP_STORAGE' => $storage,
+    'APP_SERVICES_CACHE' => $cache . '/services.php',
+    'APP_PACKAGES_CACHE' => $cache . '/packages.php',
+    'APP_CONFIG_CACHE' => $cache . '/config.php',
+    'APP_ROUTES_CACHE' => $cache . '/routes.php',
+    'APP_EVENTS_CACHE' => $cache . '/events.php',
+    'LOG_CHANNEL' => 'stderr',
+];
 
-require __DIR__.'/../vendor/autoload.php';
+foreach ($environment as $key => $value) {
+    putenv($key . '=' . $value);
+    $_ENV[$key] = $value;
+    $_SERVER[$key] = $value;
+}
 
-/*
-|--------------------------------------------------------------------------
-| Run The Application
-|--------------------------------------------------------------------------
-|
-| Once we have the application, we can handle the incoming request using
-| the application's HTTP kernel. Then, we will send the response back
-| to this client's browser, allowing them to enjoy our application.
-|
-*/
+require __DIR__ . '/../vendor/autoload.php';
 
-$app = require_once __DIR__.'/../bootstrap/app.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 
 $kernel = $app->make(Kernel::class);
 
 $response = $kernel->handle(
     $request = Request::capture()
-)->send();
+);
+
+$response->send();
 
 $kernel->terminate($request, $response);
