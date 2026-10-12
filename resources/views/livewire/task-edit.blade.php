@@ -21,7 +21,6 @@
                 <p class="welcome-copy">A quick update is all it takes to keep your plan on track.</p>
                 <div class="edit-task-preview">
                     <span class="preview-label">EDITING TASK</span>
-                    <span class="preview-number">#{{ $tasks->count() }}</span>
                 </div>
             </div>
 
